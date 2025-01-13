@@ -1,10 +1,9 @@
 import jwt from 'jsonwebtoken';
 
-export function verifyToken(handler) {
+export function verifyRole(requiredRole, handler) {
     return async (req, res) => {
         const authHeader = req.headers.authorization;
 
-        // Проверяем наличие токена
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
             return res.status(401).json({ error: 'Unauthorized: No token provided' });
         }
@@ -12,10 +11,15 @@ export function verifyToken(handler) {
         const token = authHeader.split(' ')[1];
 
         try {
-            // Проверяем и расшифровываем токен
+            // Проверяем токен
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            // Добавляем расшифрованные данные токена в запрос
+            // Проверяем роль пользователя
+            if (decoded.role !== requiredRole) {
+                return res.status(403).json({ error: 'Forbidden: Insufficient permissions' });
+            }
+
+            // Добавляем данные пользователя в запрос
             req.user = decoded;
 
             // Передаём управление следующему обработчику

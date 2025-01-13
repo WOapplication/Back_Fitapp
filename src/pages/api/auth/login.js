@@ -1,13 +1,13 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { supabase } from '/supabase.js'; // Импортируем настроенный клиент Supabase
+import { supabase } from '/supabase.js';
 
 export default async function handler(req, res) {
     if (req.method === 'POST') {
         const { email, password } = req.body;
 
         try {
-            // Проверяем, существует ли пользователь с указанным email
+            // Проверяем, существует ли пользователь
             const { data: user, error: userError } = await supabase
                 .from('users')
                 .select('*')
@@ -18,27 +18,26 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: 'Invalid email or password' });
             }
 
-            // Сравниваем введённый пароль с хэшом из базы данных
+            // Проверяем пароль
             const isPasswordCorrect = await bcrypt.compare(password, user.password);
             if (!isPasswordCorrect) {
                 return res.status(400).json({ error: 'Invalid email or password' });
             }
 
-            // Создаём JWT-токен (опционально)
+            // Создаём JWT-токен, включая роль
             const token = jwt.sign(
-                { id: user.id, email: user.email }, // Payload токена
-                process.env.JWT_SECRET, // Секретный ключ
-                { expiresIn: '2h' } // Время жизни токена
+                { id: user.id, email: user.email, role: user.role }, // Передаём роль пользователя
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
             );
 
-            // Убираем пароль из возвращаемых данных
+            // Убираем пароль из ответа
             const { password: _, ...userWithoutPassword } = user;
 
-            // Возвращаем успешный ответ
             res.status(200).json({
                 message: 'Login successful',
                 user: userWithoutPassword,
-                token, // Возвращаем токен
+                token,
             });
         } catch (err) {
             console.error('Unexpected error:', err);
