@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 
 export function middleware(req) {
+    const res = NextResponse.next();
+
     console.log('Middleware activated for URL:', req.url);
 
-    // Добавляем CORS-заголовки
-    const res = NextResponse.next();
+    // Устанавливаем CORS заголовки
     res.headers.set('Access-Control-Allow-Origin', '*');
     res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -12,7 +13,11 @@ export function middleware(req) {
     // Обработка preflight-запросов
     if (req.method === 'OPTIONS') {
         return new Response(null, {
-            headers: res.headers,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+            },
             status: 200,
         });
     }
@@ -21,5 +26,5 @@ export function middleware(req) {
 }
 
 export const config = {
-    matcher: '/api/:path*', // Middleware для всех маршрутов в папке /api/
+    matcher: '/api/:path*', // Middleware для всех маршрутов внутри /api/
 };
