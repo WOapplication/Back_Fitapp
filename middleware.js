@@ -18,3 +18,8 @@ export function middleware(req) {
 
     return res;
 }
+
+// Указываем путь, к которому применяется middleware
+export const config = {
+    matcher: '/api/:path*', // Middleware будет работать только с маршрутами, начинающимися с /api/
+};
