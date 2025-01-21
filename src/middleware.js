@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 
 export function middleware(req) {
-    const res = NextResponse.next();
+    console.log('Middleware activated for URL:', req.url);
 
-    // Добавляем заголовки CORS
+    // Добавляем CORS-заголовки
+    const res = NextResponse.next();
     res.headers.set('Access-Control-Allow-Origin', '*');
     res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -19,7 +20,6 @@ export function middleware(req) {
     return res;
 }
 
-// Указываем путь, к которому применяется middleware
 export const config = {
-    matcher: '/api/:path*', // Middleware будет работать только с маршрутами, начинающимися с /api/
+    matcher: '/api/:path*', // Middleware для всех маршрутов в папке /api/
 };
