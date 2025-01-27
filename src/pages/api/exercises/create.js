@@ -10,7 +10,6 @@ export default verifyRole('admin', async (req, res) => {
         }
 
         try {
-            // Создаём упражнение
             const { data: exercise, error: exerciseError } = await supabase
                 .from('exercises')
                 .insert([{ name, description }])
@@ -19,7 +18,6 @@ export default verifyRole('admin', async (req, res) => {
 
             if (exerciseError) throw new Error(exerciseError.message);
 
-            // Создаём уровни сложности
             const levelsData = levels.map((level) => ({
                 exercise_id: exercise.id,
                 difficulty: level.difficulty,

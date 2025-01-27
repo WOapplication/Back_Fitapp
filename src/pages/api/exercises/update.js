@@ -15,10 +15,8 @@ export default verifyRole('admin', async (req, res) => {
 
             if (exerciseError) throw new Error(exerciseError.message);
 
-            // Удаляем старые уровни
             await supabase.from('exercise_levels').delete().eq('exercise_id', id);
 
-            // Добавляем новые уровни
             const levelsData = levels.map((level) => ({
                 exercise_id: id,
                 difficulty: level.difficulty,

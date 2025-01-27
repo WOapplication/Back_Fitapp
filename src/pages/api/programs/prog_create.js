@@ -10,7 +10,6 @@ export default verifyRole('admin', async (req, res) => {
         }
 
         try {
-            // Создание программы
             const { data: program, error: programError } = await supabase
                 .from('training_programs')
                 .insert([{ name, description, duration_weeks, mandatory_workouts, optional_workouts }])
@@ -19,7 +18,6 @@ export default verifyRole('admin', async (req, res) => {
 
             if (programError) throw new Error(programError.message);
 
-            // Привязка упражнений
             const programExercises = exercises.map((exercise_id) => ({
                 program_id: program.id,
                 exercise_id,

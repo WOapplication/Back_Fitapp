@@ -6,8 +6,6 @@ export default async function handler(req, res) {
         const { email, password, name, inviteCode } = req.body;
 
         try {
-
-            // Проверяем, существует ли пользователь с таким email
             const { data: existingUser, error: existingUserError } = await supabase
                 .from('users')
                 .select('*')
@@ -23,7 +21,6 @@ export default async function handler(req, res) {
                 return res.status(500).json({ error: existingUserError.message });
             }
 
-            // Проверяем invite code
             const { data: invite, error: inviteError } = await supabase
                 .from('invite_codes')
                 .select('*')
@@ -35,10 +32,8 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: 'Invalid or inactive invite code' });
             }
 
-            // Хэшируем пароль
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            // Сохраняем пользователя в базу данных
             const { data: user, error: userError } = await supabase
                 .from('users')
                 .insert([{ email, password: hashedPassword, name, invite_code: inviteCode }])
@@ -48,13 +43,11 @@ export default async function handler(req, res) {
                 return res.status(500).json({ error: userError.message });
             }
 
-            // Деактивируем invite code
             await supabase
                 .from('invite_codes')
                 .update({ active: false, used: true })
                 .eq('id', invite.id);
 
-            // Удаляем поле password из ответа
             const { password: _, ...userWithoutPassword } = user[0];
 
             res.status(201).json({

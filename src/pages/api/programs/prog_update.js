@@ -8,7 +8,6 @@ export default verifyRole('admin', async (req, res) => {
         const { name, description, duration_weeks, mandatory_workouts, optional_workouts, exercises } = req.body;
 
         try {
-            // Обновление программы
             const { error: programError } = await supabase
                 .from('training_programs')
                 .update({ name, description, duration_weeks, mandatory_workouts, optional_workouts })
@@ -16,10 +15,8 @@ export default verifyRole('admin', async (req, res) => {
 
             if (programError) throw new Error(programError.message);
 
-            // Удаление старых привязок
             await supabase.from('program_exercises').delete().eq('program_id', id);
 
-            // Добавление новых упражнений
             const programExercises = exercises.map((exercise_id) => ({
                 program_id: id,
                 exercise_id,

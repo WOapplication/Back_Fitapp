@@ -1,4 +1,4 @@
-import { supabase } from "@/../supabase"; // Убедитесь, что путь правильный
+import { supabase } from "@/../supabase";
 
 export default async function handler(req, res) {
     if (req.method !== "GET") {
